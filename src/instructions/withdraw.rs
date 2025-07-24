@@ -97,15 +97,18 @@ impl<'a> Withdraw<'a> {
     pub const DISCRIMINATOR: &'a u8 = &1;
 
     pub fn process(&mut self) -> ProgramResult {
+        //get vault data
         let mut vault_account_data = self.accounts.vault.try_borrow_mut_data()?;
 
-        // 2. Deserialize the existing vault data
+        //  Deserialize the existing vault data
         let mut vault_data = Vault::try_from_slice(&vault_account_data)
             .map_err(|_| ProgramError::InvalidAccountData)?;
+
+        // check the balance and the specified amount
         if vault_data.balance < self.instruction_data.amount {
             return Err(ProgramError::InsufficientFunds);
         }
-
+        // deduct the amount from the balance and update the balance
         vault_data.balance -= self.instruction_data.amount;
 
         // Create PDA signer seeds
