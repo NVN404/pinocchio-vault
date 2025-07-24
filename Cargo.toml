@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 pinocchio = "0.8.4"
 pinocchio-system = "0.2.3"
+borsh = "0.9.3"
 
 [lib]
 crate-type = ["lib", "cdylib"]

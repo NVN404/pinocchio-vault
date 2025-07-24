@@ -1,3 +1,4 @@
+use borsh::{BorshDeserialize, BorshSerialize};
 use pinocchio::{
     account_info::AccountInfo,
     instruction::{Seed, Signer},
@@ -5,11 +6,12 @@ use pinocchio::{
     pubkey::find_program_address,
     ProgramResult,
 };
-use pinocchio_system::instructions::Transfer;
+use pinocchio_system::instructions::Transfer; // Import Borsh traits
+#[repr(C)]
+#[derive(BorshDeserialize, BorshSerialize)]
 pub struct Vault {
     pub balance: u64,
 }
-
 
 pub struct WithdrawAccounts<'a> {
     pub owner: &'a AccountInfo,
@@ -95,6 +97,17 @@ impl<'a> Withdraw<'a> {
     pub const DISCRIMINATOR: &'a u8 = &1;
 
     pub fn process(&mut self) -> ProgramResult {
+        let mut vault_account_data = self.accounts.vault.try_borrow_mut_data()?;
+
+        // 2. Deserialize the existing vault data
+        let mut vault_data = Vault::try_from_slice(&vault_account_data)
+            .map_err(|_| ProgramError::InvalidAccountData)?;
+        if vault_data.balance < self.instruction_data.amount {
+            return Err(ProgramError::InsufficientFunds);
+        }
+
+        vault_data.balance -= self.instruction_data.amount;
+
         // Create PDA signer seeds
         let seeds = [
             Seed::from(b"vault"),
@@ -110,9 +123,6 @@ impl<'a> Withdraw<'a> {
             lamports: self.instruction_data.amount,
         }
         .invoke_signed(&signers)?;
-
-     let mut vault_data = Vault::load_mut(self.accounts.vault)?;
-        vault_data.balance = self.accounts.vault.lamports();
 
         Ok(())
     }

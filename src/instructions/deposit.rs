@@ -123,7 +123,7 @@ impl<'a> Deposit<'a> {
         vault(
             self.accounts.owner,
             self.accounts.vault,
-            &[Seed::new(b"vault", self.accounts.owner.key())],
+            &[b"vault".into(), self.accounts.owner.key().as_ref().into()],
             Vault::LEN,
         )?;
 
@@ -133,8 +133,6 @@ impl<'a> Deposit<'a> {
             lamports: self.instruction_data.amount,
         }
         .invoke()?;
-
-       
 
         Ok(())
     }

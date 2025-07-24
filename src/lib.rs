@@ -3,7 +3,6 @@
     use pinocchio::{account_info::AccountInfo, entrypoint, nostd_panic_handler, program_error::ProgramError, pubkey::Pubkey, ProgramResult};
     
     entrypoint!(process_instruction);
-    nostd_panic_handler!();
     
     pub mod instructions;
     pub use instructions::*;
