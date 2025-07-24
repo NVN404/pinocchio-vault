@@ -11,6 +11,8 @@ A minimal Solana smart contract to manage user deposits , withdraw and track bal
 - Users can withdraw SOL into a vault account with specified amount
 
 - Built with `Pinocchio` — zero-copy, gas-efficient, and `no_std`-friendly.
-- to run it use this command `cargo build-sbf`
+ 
+- to run it use this command `cargo add pinocchio pinocchio-system ` -only for first run
+-  then `cargo build-sbf`
 
 ---
